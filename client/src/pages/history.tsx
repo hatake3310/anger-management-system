@@ -11,7 +11,7 @@ export default function History() {
   const [filterPeriod, setFilterPeriod] = useState("all");
   const [filterEmotion, setFilterEmotion] = useState("all");
 
-  const { data: records, isLoading } = useQuery({
+  const { data: records, isLoading } = useQuery<AngerRecord[]>({
     queryKey: ["/api/anger-records"],
   });
 
