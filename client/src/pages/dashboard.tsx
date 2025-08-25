@@ -4,13 +4,15 @@ import { Calendar, Smile, Lightbulb, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Stats } from "@shared/types";
+import { AngerRecord } from "@shared/schema";
 
 export default function Dashboard() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<Stats>({
     queryKey: ["/api/stats"],
   });
 
-  const { data: recentRecords, isLoading: recordsLoading } = useQuery({
+  const { data: recentRecords, isLoading: recordsLoading } = useQuery<AngerRecord[]>({
     queryKey: ["/api/anger-records"],
   });
 
@@ -55,7 +57,7 @@ export default function Dashboard() {
           
           <StatsCard
             title="認知の歪み検出"
-            value={stats?.commonDistortions?.reduce((sum, d) => sum + d.count, 0) || 0}
+            value={stats?.commonDistortions?.reduce((sum: number, d: { type: string; count: number }) => sum + d.count, 0) || 0}
             subtitle="今月の合計"
             icon={Lightbulb}
             bgColor="bg-warm"
@@ -100,7 +102,7 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-600 mb-3">
                     よく検出される認知の歪み:
                   </p>
-                  {stats.commonDistortions.slice(0, 3).map((distortion, index) => (
+                  {stats.commonDistortions.slice(0, 3).map((distortion: { type: string; count: number }) => (
                     <div key={distortion.type} className="flex justify-between items-center">
                       <span className="text-sm">{getDistortionLabel(distortion.type)}</span>
                       <span className="text-sm font-medium text-accent">{distortion.count}回</span>

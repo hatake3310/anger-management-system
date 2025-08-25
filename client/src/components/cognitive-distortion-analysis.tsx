@@ -15,7 +15,7 @@ export default function CognitiveDistortionAnalysis({
   situation,
   evidence
 }: CognitiveDistortionAnalysisProps) {
-  const { data: distortions, isLoading } = useQuery({
+  const { data: distortions, isLoading } = useQuery<CognitiveDistortion[]>({
     queryKey: ["/api/analyze-distortions", thoughts, situation, evidence],
     queryFn: async () => {
       if (!thoughts.trim()) return [];
@@ -27,7 +27,7 @@ export default function CognitiveDistortionAnalysis({
       });
       
       if (!response.ok) throw new Error("Failed to analyze distortions");
-      return response.json() as CognitiveDistortion[];
+      return response.json();
     },
     enabled: !!thoughts.trim(),
   });

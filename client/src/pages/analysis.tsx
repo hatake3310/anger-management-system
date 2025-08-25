@@ -3,13 +3,15 @@ import AnalyticsCharts from "@/components/analytics-charts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, TrendingUp, Lightbulb } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Stats } from "@shared/types";
+import { AngerRecord } from "@shared/schema";
 
 export default function Analysis() {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading } = useQuery<Stats>({
     queryKey: ["/api/stats"],
   });
 
-  const { data: records, isLoading: recordsLoading } = useQuery({
+  const { data: records, isLoading: recordsLoading } = useQuery<AngerRecord[]>({
     queryKey: ["/api/anger-records"],
   });
 
@@ -42,7 +44,7 @@ export default function Analysis() {
     );
   }
 
-  const totalDistortions = stats?.commonDistortions?.reduce((sum, d) => sum + d.count, 0) || 0;
+  const totalDistortions = stats?.commonDistortions?.reduce((sum: number, d: { type: string; count: number }) => sum + d.count, 0) || 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
@@ -63,7 +65,7 @@ export default function Analysis() {
             <div className="mt-4 grid grid-cols-2 gap-4 text-center">
               <div className="bg-red-50 p-3 rounded-lg">
                 <div className="text-2xl font-bold text-red-600">
-                  {records?.length > 0 
+                  {records && records.length > 0
                     ? Math.round(records.reduce((sum, r) => sum + r.moodBefore, 0) / records.length)
                     : 0}%
                 </div>
@@ -90,7 +92,7 @@ export default function Analysis() {
           <CardContent className="p-6">
             <div className="space-y-4">
               {stats?.commonDistortions && stats.commonDistortions.length > 0 ? (
-                stats.commonDistortions.map((distortion) => {
+                stats.commonDistortions.map((distortion: { type: string; count: number }) => {
                   const percentage = getDistortionPercentage(distortion.count, totalDistortions);
                   return (
                     <div key={distortion.type} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
