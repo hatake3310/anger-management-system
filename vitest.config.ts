@@ -7,6 +7,17 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     include: ['shared/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      reportsDirectory: './coverage',
+      include: ['shared/**'],
+      exclude: [
+        'shared/**/*.test.ts',
+        'shared/schema.ts',
+        'shared/types.ts'
+      ],
+    },
   },
   resolve: {
     alias: {
