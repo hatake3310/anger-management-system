@@ -1,16 +1,32 @@
+// フロントエンドと共有しているCognitiveDistortion型をインポートします。
 import { CognitiveDistortion } from "@shared/schema";
 
+/**
+ * 認知の歪みを検出し、関連情報を提供するサービスクラス。
+ */
 export class CognitiveDistortionService {
+  /**
+   * 与えられたテキストから認知の歪みを検出します。
+   * @param thoughts - 「自動思考」のテキスト
+   * @param situation - 「状況」のテキスト (任意)
+   * @param evidence - 「根拠」のテキスト (任意)
+   * @returns - 検出された認知の歪みの配列
+   */
   detectDistortions(thoughts: string, situation: string = "", evidence: string = ""): CognitiveDistortion[] {
+    // 検出された歪みを格納するための配列
     const distortions: CognitiveDistortion[] = [];
+    // 分析対象のテキストをすべて結合し、小文字に変換します。
     const text = `${thoughts} ${situation} ${evidence}`.toLowerCase();
 
-    // Labeling detection
+    // --- 認知の歪みパターンの定義と検出 ---
+
+    // 1. ラベリング (Labeling) の検出
+    // 例：「あいつはバカだ」「私はダメな人間だ」など、人に対して否定的なレッテルを貼る思考。
     const labelingPatterns = [
       /あいつ/g, /やつ/g, /バカ/g, /ダメ/g, /無能/g, /最悪/g, /くそ/g, /うざい/g,
       /だめな人/g, /ひどい人/g, /最低/g
     ];
-    
+    // パターンのいずれかがテキストに含まれているかチェックします。
     if (labelingPatterns.some(pattern => pattern.test(text))) {
       distortions.push({
         type: "labeling",
@@ -19,12 +35,12 @@ export class CognitiveDistortionService {
       });
     }
 
-    // Mind reading detection
+    // 2. 読心術 (Mind Reading) の検出
+    // 例：「彼はきっと私のことを嫌っているに違いない」など、根拠なく他人の心を決めつける思考。
     const mindReadingPatterns = [
       /どうせ.*考えて/g, /きっと.*思っている/g, /.*に違いない/g, /絶対.*思っている/g,
       /どうせ.*ない/g, /.*はず/g, /間違いなく/g
     ];
-    
     if (mindReadingPatterns.some(pattern => pattern.test(text))) {
       distortions.push({
         type: "mind_reading",
@@ -33,12 +49,12 @@ export class CognitiveDistortionService {
       });
     }
 
-    // All-or-nothing thinking detection
+    // 3. 白黒思考 (All-or-Nothing Thinking) の検出
+    // 例：「いつも失敗する」「絶対に成功しないといけない」など、物事を0か100かで極端に考える思考。
     const allOrNothingPatterns = [
       /いつも/g, /必ず/g, /絶対/g, /全然/g, /まったく/g, /完全に/g, /全部/g,
       /一度も/g, /決して/g, /すべて/g
     ];
-    
     if (allOrNothingPatterns.some(pattern => pattern.test(text))) {
       distortions.push({
         type: "all_or_nothing",
@@ -47,12 +63,12 @@ export class CognitiveDistortionService {
       });
     }
 
-    // Personalization detection
+    // 4. 個人化 (Personalization) の検出
+    // 例：「プロジェクトが失敗したのは私のせいだ」など、何でも自分の責任だと考える思考。
     const personalizationPatterns = [
       /私のせい/g, /自分が悪い/g, /私が.*だから/g, /自分の責任/g,
       /私のミス/g, /自分が原因/g
     ];
-    
     if (personalizationPatterns.some(pattern => pattern.test(text))) {
       distortions.push({
         type: "personalization",
@@ -61,12 +77,12 @@ export class CognitiveDistortionService {
       });
     }
 
-    // Externalization detection
+    // 5. 外部化 (Externalization) の検出
+    // 例：「うまくいかないのは、あいつのせいだ」など、何でも他人や環境のせいにする思考。
     const externalizationPatterns = [
       /相手が悪い/g, /環境のせい/g, /.*のせい/g, /運が悪い/g,
       /世の中が/g, /社会が/g, /他人が/g
     ];
-    
     if (externalizationPatterns.some(pattern => pattern.test(text))) {
       distortions.push({
         type: "externalization",
@@ -75,9 +91,15 @@ export class CognitiveDistortionService {
       });
     }
 
+    // 検出された歪みの配列を返します。
     return distortions;
   }
 
+  /**
+   * 認知の歪みの種類（type）から、日本語のラベルを取得します。
+   * @param type - 認知の歪みの種類 (例: "labeling")
+   * @returns - 日本語のラベル (例: "ラベリング")
+   */
   getDistortionTypeLabel(type: string): string {
     const labels = {
       labeling: "ラベリング",
@@ -86,8 +108,12 @@ export class CognitiveDistortionService {
       personalization: "個人化",
       externalization: "外部化"
     };
+    // オブジェクトから対応するラベルを返すか、見つからなければ元のtypeを返します。
     return labels[type as keyof typeof labels] || type;
   }
 }
 
+// CognitiveDistortionServiceのインスタンスを作成します。
+// このインスタンスを他のファイルからインポートして使用することで、
+// アプリケーション全体で一貫したサービスを利用できます（シングルトンパターン）。
 export const cognitiveDistortionService = new CognitiveDistortionService();
