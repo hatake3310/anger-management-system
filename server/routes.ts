@@ -102,6 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // 統計情報をJSON形式で返します。
       res.json(stats);
     } catch (error) {
+      // エラーが発生した場合は、500エラーを返します。
       res.status(500).json({ message: "Failed to fetch stats", error });
     }
   });
