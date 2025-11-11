@@ -27,7 +27,7 @@ export function detectDistortions(thoughts: string, situation: string = "", evid
     distortions.push({
       type: "labeling",
       description: "相手や自分に否定的なレッテルを貼っています。",
-      suggestion: "具体的な行動や事実に焦点を当てましょう。"
+      suggestion: "レッテルではなく、具体的な行動に焦点を当ててみましょう。「彼は無能だ」ではなく、「彼の報告書には改善点があった」のように、具体的な事実を客観的に表現することで、より建設的な視点が生まれます。"
     });
   }
 
@@ -43,7 +43,7 @@ export function detectDistortions(thoughts: string, situation: string = "", evid
     distortions.push({
       type: "mind_reading",
       description: "相手の気持ちや考えを推測で決めつけています。",
-      suggestion: "確認せずに推測は控え、事実に基づいて判断しましょう。"
+      suggestion: "相手の心を読もうとせず、事実に基づいて考えましょう。自分の推測が本当に正しいのか、相手に直接質問したり、客観的な証拠を探したりすることで、誤解を減らすことができます。"
     });
   }
 
@@ -59,7 +59,7 @@ export function detectDistortions(thoughts: string, situation: string = "", evid
     distortions.push({
       type: "all_or_nothing",
       description: "物事を極端に捉える白黒思考が見られます。",
-      suggestion: "グレーゾーンや中間的な視点を探してみましょう。"
+      suggestion: "物事を0か100かで判断するのではなく、中間の視点を探してみましょう。「すべて失敗だ」ではなく、「この部分はうまくいったが、ここは改善できる」のように、部分的に評価することで、より現実的な捉え方ができます。"
     });
   }
 
@@ -75,7 +75,7 @@ export function detectDistortions(thoughts: string, situation: string = "", evid
     distortions.push({
       type: "personalization",
       description: "すべてを自分のせいにする傾向があります。",
-      suggestion: "他の要因や外部環境の影響も考慮してみましょう。"
+      suggestion: "すべての責任を一人で背負うのではなく、他の要因も考慮に入れましょう。問題には、自分以外の様々な要因が関わっている可能性があります。出来事を客観的に分析し、責任の所在を現実的に評価することが大切です。"
     });
   }
 
@@ -91,7 +91,21 @@ export function detectDistortions(thoughts: string, situation: string = "", evid
     distortions.push({
       type: "externalization",
       description: "すべてを外部要因のせいにする傾向があります。",
-      suggestion: "自分でコントロールできる部分も探してみましょう。"
+      suggestion: "他人のせいや環境のせいにするだけでなく、自分にできることを見つけてみましょう。状況を変えるために自分がコントロールできる小さな一歩は何かを考えることで、主体的に問題解決に取り組むことができます。"
+    });
+  }
+
+  // 6. べき思考 (Should Statements) の検出
+  // 自分や他人に対して「～べきだ」「～べきでない」という厳しいルールを課し、それが満たされないときに怒りや罪悪感を感じる思考パターンを検出します。
+  const shouldStatementPatterns = [
+    /べき/g, /はずだ/g, /当然だ/g, /なければならない/g, /なくてはならない/g
+  ];
+
+  if (shouldStatementPatterns.some(pattern => pattern.test(text))) {
+    distortions.push({
+      type: "should_thinking",
+      description: "自分や他人に対して「～べきだ」「～べきでない」と厳しいルールを課し、それが満たされないと怒りや罪悪感を感じています。",
+      suggestion: "「～べき」という考えを、「～だといいな」「～したい」という柔軟な願望に置き換えてみましょう。これにより、自分や他人に対する過度な期待を手放し、心の負担を軽くすることができます。"
     });
   }
 
@@ -110,7 +124,8 @@ export function getDistortionTypeLabel(type: string): string {
     mind_reading: "読心",
     all_or_nothing: "白黒思考",
     personalization: "個人化",
-    externalization: "外部化"
+    externalization: "外部化",
+    should_thinking: "べき思考"
   };
   // type文字列をキーとして、対応する日本語ラベルを返す
   // もし対応するラベルが見つからない場合は、元のtype文字列をそのまま返す

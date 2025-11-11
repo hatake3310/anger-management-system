@@ -38,7 +38,8 @@ export default function CognitiveDistortionAnalysis({
       mind_reading: "読心",
       all_or_nothing: "白黒思考",
       personalization: "個人化",
-      externalization: "外部化"
+      externalization: "外部化",
+      should_thinking: "べき思考"
     };
     return labels[type as keyof typeof labels] || type;
   };
@@ -49,7 +50,8 @@ export default function CognitiveDistortionAnalysis({
       mind_reading: "bg-blue-100 text-blue-800",
       all_or_nothing: "bg-purple-100 text-purple-800",
       personalization: "bg-yellow-100 text-yellow-800",
-      externalization: "bg-green-100 text-green-800"
+      externalization: "bg-green-100 text-green-800",
+      should_thinking: "bg-indigo-100 text-indigo-800"
     };
     return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
@@ -103,10 +105,9 @@ export default function CognitiveDistortionAnalysis({
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{distortion.description}</p>
-                  <div className="mt-2">
-                    <Badge variant="outline" className="bg-accent/10 text-accent border-accent">
-                      改善のヒント: {distortion.suggestion}
-                    </Badge>
+                  <div className="mt-2 p-3 bg-accent/10 rounded-lg">
+                    <p className="text-sm font-semibold text-accent mb-1">対処法の提案</p>
+                    <p className="text-sm text-accent/90">{distortion.suggestion}</p>
                   </div>
                 </div>
               </div>
