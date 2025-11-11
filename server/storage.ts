@@ -68,6 +68,10 @@ export class MemStorage implements IStorage {
       id,
       emotions: JSON.stringify(insertRecord.emotions),
       detectedDistortions: JSON.stringify(insertRecord.detectedDistortions),
+      copingPlans: JSON.stringify(insertRecord.copingPlans ?? []),
+      followUpReview: insertRecord.followUpReview
+        ? JSON.stringify(insertRecord.followUpReview)
+        : null,
       createdAt: new Date(),
     };
     this.angerRecords.set(id, record);

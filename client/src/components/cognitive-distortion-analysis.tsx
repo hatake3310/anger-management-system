@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, AlertTriangle } from "lucide-react";
@@ -8,12 +9,14 @@ interface CognitiveDistortionAnalysisProps {
   thoughts: string;
   situation: string;
   evidence: string;
+  onDistortionsChange?: (distortions: CognitiveDistortion[]) => void;
 }
 
 export default function CognitiveDistortionAnalysis({
   thoughts,
   situation,
-  evidence
+  evidence,
+  onDistortionsChange
 }: CognitiveDistortionAnalysisProps) {
   const { data: distortions, isLoading } = useQuery<CognitiveDistortion[]>({
     queryKey: ["/api/analyze-distortions", thoughts, situation, evidence],
@@ -31,6 +34,12 @@ export default function CognitiveDistortionAnalysis({
     },
     enabled: !!thoughts.trim(),
   });
+
+  useEffect(() => {
+    if (onDistortionsChange) {
+      onDistortionsChange(distortions ?? []);
+    }
+  }, [distortions, onDistortionsChange]);
 
   const getDistortionLabel = (type: string): string => {
     const labels = {

@@ -1,4 +1,4 @@
-import { AngerRecord, Emotion, CognitiveDistortion } from "@shared/schema";
+import { AngerRecord, Emotion, CognitiveDistortion, CopingPlan, FollowUpReview } from "@shared/schema";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight } from "lucide-react";
@@ -234,6 +234,104 @@ export default function RecordsList({ records, isLoading, filterPeriod, filterEm
                     );
                   } catch {
                     return <p className="text-sm text-gray-500">分析データなし</p>;
+                  }
+                })()}
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">対処プラン</h4>
+                {(() => {
+                  try {
+                    const plans = JSON.parse(selectedRecord.copingPlans) as CopingPlan[];
+                    if (!plans || plans.length === 0) {
+                      return <p className="text-sm text-gray-500">登録された対処プランはありません。</p>;
+                    }
+
+                    return (
+                      <div className="space-y-2">
+                        {plans.map((plan) => (
+                          <div key={plan.id} className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-800">
+                                {getDistortionLabel(plan.distortionType)}
+                              </span>
+                              {plan.willTry ? (
+                                <Badge variant="outline" className="border-orange-300 text-orange-700">
+                                  実行予定
+                                </Badge>
+                              ) : null}
+                            </div>
+                            <p className="mt-2 text-sm text-gray-700 whitespace-pre-line">{plan.action}</p>
+                            {plan.supportNotes && (
+                              <p className="mt-2 text-xs text-gray-500">補足: {plan.supportNotes}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  } catch {
+                    return <p className="text-sm text-gray-500">プラン情報を読み取れませんでした。</p>;
+                  }
+                })()}
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">フォローアップ</h4>
+                {(() => {
+                  if (!selectedRecord.followUpReview) {
+                    return <p className="text-sm text-gray-500">フォローアップ記録はまだありません。</p>;
+                  }
+
+                  try {
+                    const review = JSON.parse(selectedRecord.followUpReview) as FollowUpReview;
+                    if (!review || !review.items || review.items.length === 0) {
+                      return <p className="text-sm text-gray-500">フォローアップ記録はまだありません。</p>;
+                    }
+
+                    const planLookup = (() => {
+                      try {
+                        const plans = JSON.parse(selectedRecord.copingPlans) as CopingPlan[];
+                        return new Map(plans.map((plan) => [plan.id, plan]));
+                      } catch {
+                        return new Map<string, CopingPlan>();
+                      }
+                    })();
+
+                    return (
+                      <div className="space-y-3">
+                        {review.items.map((item) => {
+                          const plan = planLookup.get(item.planId);
+                          return (
+                            <div key={item.planId} className="rounded-lg border border-teal-200 bg-teal-50 p-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <p className="text-sm font-medium text-gray-700">
+                                    {plan ? getDistortionLabel(plan.distortionType) : "プラン"}
+                                  </p>
+                                  <p className="text-sm text-gray-600 mt-1">{item.planSummary}</p>
+                                </div>
+                                <Badge
+                                  variant="outline"
+                                  className={item.attempted ? "border-teal-300 text-teal-700" : "border-gray-300 text-gray-600"}
+                                >
+                                  {item.attempted ? "実行" : "未実行"}
+                                </Badge>
+                              </div>
+                              {item.notes && (
+                                <p className="mt-2 text-xs text-gray-600 whitespace-pre-line">メモ: {item.notes}</p>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {review.reflection && (
+                          <div className="rounded-lg border border-teal-200 bg-white p-3">
+                            <p className="text-xs text-gray-600 whitespace-pre-line">全体メモ: {review.reflection}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  } catch {
+                    return <p className="text-sm text-gray-500">フォローアップ情報を読み取れませんでした。</p>;
                   }
                 })()}
               </div>
